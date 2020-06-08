@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: limited-read-only-user
+  namespace: kube-system
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-limited-read-only
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - "services"
+  - "endpoints"
+  - "pods"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: limited-read-only-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-limited-read-only
+subjects:
+- kind: ServiceAccount
+  name: limited-read-only-user
+  namespace: kube-system
+
+#kubectl cluster-info
+#kubectl -n kube-system get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='limited-read-only-user')].data.token}"|base64 --decode
