@@ -36,6 +36,3 @@ subjects:
 - kind: ServiceAccount
   name: limited-read-only-user
   namespace: kube-system
-
-#kubectl cluster-info
-#kubectl -n kube-system get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='limited-read-only-user')].data.token}"|base64 --decode
