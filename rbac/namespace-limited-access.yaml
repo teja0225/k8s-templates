@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: namespace-limited-read
+  name: namespace-limited-access
   namespace: default
 
 ---
@@ -9,31 +9,36 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: namespace-limited-read
+  name: namespace-limited-access
 rules:
 - apiGroups:
   - ""
+  - "apps"
+  - "autoscaling"
   resources:
-  - "services"
-  - "endpoints"
-  - "pods"
-  - "pv"
+  - "*"
   verbs:
   - "get"
   - "list"
   - "watch"
+- apiGroups:
+  - ""
+  resources:
+  - "pods"
+  verbs:
+  - "delete"
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: namespace-limited-read
+  name: namespace-limited-access
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: namespace-limited-read
+  name: namespace-limited-access
 subjects:
 - kind: ServiceAccount
-  name: namespace-limited-read
+  name: namespace-limited-access
   namespace: default
