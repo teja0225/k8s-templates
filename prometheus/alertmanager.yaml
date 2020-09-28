@@ -1,0 +1,46 @@
+alertmanagerFiles:
+  alertmanager.yml:
+    global:
+      smtp_smarthost: 'email-smtp.us-west-2.amazonaws.com:587'
+      smtp_from: 'k8s-alerts@amagi.tv'
+      # smtp_auth_username: ''
+      # smtp_auth_password: ''
+    route:
+      group_by: [alertname, datacenter, app]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 5m
+      receiver: 'pod-alerts'
+      routes:
+      - match:
+          alertname: PodNotReady
+        receiver: 'pod-alerts'
+    receivers:
+    - name: 'pod-alerts'
+      email_configs:
+      - to: 'tejaswini@amagi.com,arpitm@amagi.com'
+        headers:
+          subject: |-
+            [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+        text: >-
+           {{ range .Alerts -}}
+           *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+           *Description:* {{ .Annotations.description }}
+           *Details:*
+             {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+             {{ end }}
+           {{ end }}
+
+serverFiles:
+  alerting_rules.yml:
+    groups:
+    - name: pods
+      rules:
+      - alert: PodNotReady
+        annotations:
+          description: Pod {{ $labels.namespace }}/{{ $labels.pod }} is not in ready state for more than 5 min.
+          title: PodNotReady
+        expr: sum by (namespace, pod) (kube_pod_container_status_ready) == 0
+        for: 5m
+        labels:
+          severity: critical
