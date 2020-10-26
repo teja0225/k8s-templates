@@ -1,2 +1,2 @@
-BLIP_IMAGE: "amagidevops/blip:tej-initializer_for_docker_v4"
+BLIP_IMAGE: "amagidevops/blip:tej-initializer_for_docker_v3"
 MONITORING_IMAGE: "amagidevops/monitoring:v2.4.14"
