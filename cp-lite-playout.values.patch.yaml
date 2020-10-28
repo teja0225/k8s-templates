@@ -1,0 +1,3 @@
+PLAYER_IMAGE: amagidevops/mimas:fr_rc_4.16.0_hook_v22_licensed
+EBS_SIZE: 100Gi
+AZ: us-east-1c
